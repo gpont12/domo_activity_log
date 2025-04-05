@@ -1,6 +1,5 @@
 from typing import Optional
 import pandas as pd
-from pathlib import Path
 
 from domo_dataset import DomoDataset
 from utils import save_dataframe_to_csv
@@ -30,7 +29,7 @@ def get_activity_data_from_csv(start_date: str, end_date: str, creds_file: str =
 
     all_activity_data = pd.DataFrame()
 
-    for _, row in credentials.iterrows():
+    for _, row in credentials.iterrows(): 
         try:
             client_id = row['client_id']
             client_secret = row['client_secret']

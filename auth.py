@@ -19,7 +19,7 @@ class Authentication:
         client_id (str): The Domo client ID
         secret (str): The Domo client secret
         scope (str): The OAuth scope for the token
-        token_expiry_buffer (int, optional): Minutes before token expiry to refresh. Defaults to 5.
+        token_expiry_buffer (int, optional): Minutes before token expiry to refresh. Defaults to 5.    
     """
     
     def __init__(self, client_id: str, secret: str, scope: str, token_expiry_buffer: int = 5):
@@ -30,7 +30,6 @@ class Authentication:
         self._token: Optional[str] = None
         self._token_expiry: Optional[datetime] = None
         self._domain: Optional[str] = None
-        self._session = requests.Session()
 
     @property
     def token(self) -> str:
@@ -59,7 +58,11 @@ class Authentication:
         Raises:
             DomoAuthError: If token refresh fails
         """
-        auth_url = f'https://api.domo.com/oauth/token?grant_type=client_credentials&scope={self.scope}'
+        auth_url = 'https://api.domo.com/oauth/token'               
+        params = {
+    'grant_type': 'client_credentials',
+    'scope': self.scope
+}
         auth = f'{self.client_id}:{self.secret}'
         auth_base64 = base64.b64encode(auth.encode()).decode("utf-8")
         headers = {
@@ -68,7 +71,7 @@ class Authentication:
         }
         
         try:
-            response = self._session.get(auth_url, headers=headers)
+            response = requests.get(auth_url, headers=headers, params=params)
             response.raise_for_status()
             token_data = response.json()
         except requests.exceptions.RequestException as e:
@@ -80,8 +83,8 @@ class Authentication:
         if not self._token:
             raise DomoAuthError('No access token in response')
             
-        # Token expires in 1 hour (3600 seconds)
-        self._token_expiry = datetime.now() + timedelta(seconds=3600)
+        expires_in = token_data.get('expires_in', 3600)
+        self._token_expiry = datetime.now() + timedelta(seconds=expires_in)
         self._domain = token_data.get('domain')
 
     def get_credential_domain(self) -> Optional[str]:

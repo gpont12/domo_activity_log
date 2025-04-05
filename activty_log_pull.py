@@ -53,6 +53,7 @@ class DomoActivityLog:
             'Accept': "application/json",
             "Authorization": f"Bearer {self.auth.token}"
         }
+        print(params)
         try:
             return make_request(self._base_url, headers, params=params)
         except Exception as e:
@@ -90,8 +91,8 @@ class DomoActivityLog:
             try:
                 print(f"Fetching logs with offset: {offset}")
                 json_data = self._make_request({
-                    "startDate": start,
-                    "endDate": end,
+                    "start": start,
+                    "end": end,
                     "limit": batch_size,
                     "offset": offset
                 })
