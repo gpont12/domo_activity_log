@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-from auth import Authentication, DomoAuthError
+from auth import Authentication
 from utils import make_request
 
 
@@ -22,8 +22,7 @@ class DomoDataset:
     Args:
         dsid (str, optional): Dataset ID. If not provided, a new dataset will be created.
     """
-
-    def __init__(self, dsid: Optional[str] = None):
+    def __init__(self, dsid: Optional[str] = None, dataset_name: str = "Activity Log"):
         load_dotenv()
         self.dsid = dsid
         
@@ -35,6 +34,7 @@ class DomoDataset:
             
         self.auth = Authentication(client_id, client_secret, 'data')
         self._base_url = 'https://api.domo.com/v1/datasets'
+        self.dataset_name = dataset_name
 
     def _make_request(self, method: str, endpoint: str, headers: Optional[Dict[str, str]] = None,
                      data: Optional[Any] = None, params: Optional[Dict[str, Any]] = None) -> Any:
@@ -124,7 +124,7 @@ class DomoDataset:
                 ]
             }
             
-            self.create_dataset('Activity Log', schema)
+            self.create_dataset(self.dataset_name, schema)
             
         try:
             csv_data = StringIO()

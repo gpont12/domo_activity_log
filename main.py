@@ -59,7 +59,7 @@ def send_data_to_domo(dsid: str, data: pd.DataFrame) -> None:
         dsid (str): Domo dataset ID
         data (pd.DataFrame): Data to send
     """
-    domo_dataset = DomoDataset(dsid)
+    domo_dataset = DomoDataset(dsid, dataset_name="Activity Log")
     domo_dataset.upload_data(data)
 
 
