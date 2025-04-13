@@ -2,7 +2,7 @@ from typing import Optional
 import pandas as pd
 
 from domo_dataset import DomoDataset
-from utils import save_dataframe_to_csv
+from utils import save_dataframe_to_csv, validate_and_convert_dtypes
 from activty_log_pull import DomoActivityLog
 
 
@@ -65,10 +65,11 @@ def send_data_to_domo(dsid: str, data: pd.DataFrame) -> None:
 
 if __name__ == '__main__':
     start_date = '2025-04-01'
-    end_date = '2025-04-03'
+    end_date = '2025-04-12'
     dsid = None
 
     activity_data = get_activity_data_from_csv(start_date, end_date)
     if activity_data is not None:
-        save_dataframe_to_csv(activity_data, 'data/activity_log_data.csv')
-        send_data_to_domo(dsid, activity_data)
+        activity_data_clean = validate_and_convert_dtypes(activity_data)
+        save_dataframe_to_csv(activity_data_clean, 'data/activity_log_data.csv')
+        send_data_to_domo(dsid, activity_data_clean)

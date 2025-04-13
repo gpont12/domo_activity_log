@@ -8,10 +8,10 @@ from requests.exceptions import RequestException
 
 
 def make_request(url: str,
-                headers: Dict[str, str],
-                method: str = 'GET',
-                data: Optional[Union[Dict[str, Any], str]] = None,
-                params: Optional[Dict[str, Any]] = None) -> Union[Dict[str, Any], str]:
+                 headers: Dict[str, str],
+                 method: str = 'GET',
+                 data: Optional[Union[Dict[str, Any], str]] = None,
+                 params: Optional[Dict[str, Any]] = None) -> Union[Dict[str, Any], str]:
     """
     Centralized request handler for making HTTP requests to Domo API.
     
@@ -87,3 +87,19 @@ def save_dataframe_to_csv(df: pd.DataFrame, file_path: str, index: bool = False)
     df.to_csv(path, index=index)
     print(f"DataFrame saved to {file_path}")
 
+
+def validate_and_convert_dtypes(df: pd.DataFrame) -> pd.DataFrame:
+    """Validate and convert data types for specific columns"""
+
+    # Convert userId and objectId to integers
+    integer_columns = ['userId', 'objectId']
+    for col in integer_columns:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce').astype('Int64')  # Using Int64 to handle NaN values
+
+    # Convert time to datetime with explicit format
+    if 'time' in df.columns:
+        # Format matches '2025-04-01 15:36:41'
+        df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
+
+    return df
